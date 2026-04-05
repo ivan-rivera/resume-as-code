@@ -112,13 +112,13 @@ $(PATCH_YAML): $(JOB_MD) | $(BUILD_DIR)
 		echo ''; \
 		echo 'Produce a YAML patch following your system prompt rules.'; \
 	} > $(BUILD_DIR)/tailor_prompt.txt
-	@claude --bare \
-		-p "$$(cat $(BUILD_DIR)/tailor_prompt.txt)" \
+	@claude -p "$$(cat $(BUILD_DIR)/tailor_prompt.txt)" \
 		--system-prompt-file $(TAILOR_SYS) \
 		--max-turns 1 \
 		--no-session-persistence \
 		--output-format text \
 		--model $(MODEL) \
+		| awk '/^```/{if(p)exit} /^patches:/{p=1} p' \
 		> $(PATCH_YAML)
 	@test -s $(PATCH_YAML) || { echo "ERROR: LLM returned empty output"; rm -f $(PATCH_YAML); exit 1; }
 
@@ -143,13 +143,13 @@ $(AUDIT_REPORT): $(TAILORED_YAML) | $(BUILD_DIR)
 		cat $(TAILORED_YAML); \
 		echo '</TAILORED>'; \
 	} > $(BUILD_DIR)/audit_prompt.txt
-	@claude --bare \
-		-p "$$(cat $(BUILD_DIR)/audit_prompt.txt)" \
+	@claude -p "$$(cat $(BUILD_DIR)/audit_prompt.txt)" \
 		--system-prompt-file $(AUDIT_SYS) \
 		--max-turns 1 \
 		--no-session-persistence \
 		--output-format text \
 		--model $(MODEL) \
+		| awk '/^(PASS|FAIL)/{p=1} p' \
 		> $(AUDIT_REPORT)
 	@result=$$(head -1 $(AUDIT_REPORT) | tr -d '[:space:]'); \
 	if [ "$$result" = "PASS" ]; then \
@@ -199,13 +199,13 @@ $(OUTPUT_PDF): $(AUDIT_REPORT) | $(BUILD_DIR)
 				echo ''; \
 				echo "The resume compiles to $$pages pages. Trim to fit 2 pages."; \
 			} > $(BUILD_DIR)/trim_prompt.txt; \
-			claude --bare \
-				-p "$$(cat $(BUILD_DIR)/trim_prompt.txt)" \
+			claude -p "$$(cat $(BUILD_DIR)/trim_prompt.txt)" \
 				--system-prompt-file $(TRIM_SYS) \
 				--max-turns 1 \
 				--no-session-persistence \
 				--output-format text \
 				--model $(MODEL) \
+				| awk '/^(personal:|summary:|languages:|skills:|experience:|education:|awards_and_publications:|extra_qualifications:|interests:)/{p=1} p' \
 				> $${current_yaml}.tmp \
 			&& mv $${current_yaml}.tmp $$current_yaml; \
 		else \

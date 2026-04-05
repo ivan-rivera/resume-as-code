@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_OUTPUT\" | grep -q 'Done: build/resume.pdf'; then open build/resume.pdf 2>/dev/null || xdg-open build/resume.pdf 2>/dev/null || true; fi"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(make *)",
+      "Bash(typst *)",
+      "Bash(python3 scripts/*)",
+      "Bash(pdfinfo *)",
+      "Bash(curl *)"
+    ]
+  }
+}

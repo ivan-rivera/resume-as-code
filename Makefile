@@ -11,6 +11,9 @@ SHELL       := /bin/bash
 URL         ?=
 MODEL       ?= claude-sonnet-4-6
 MAX_RETRIES := 2
+COMPANY ?=
+ROLE    ?= ML Engineer
+
 
 # ── Paths ─────────────────────────────────────────────────
 RESUME_YAML   := data/resume.yaml
@@ -31,7 +34,7 @@ TRIM_SYS      := prompts/trim_system.txt
 APPLY_PATCH   := python3 scripts/apply_patch.py
 
 # ── Targets ───────────────────────────────────────────────
-.PHONY: resume fetch tailor audit render clean test help \
+.PHONY: resume fetch tailor audit render clean test help research \
         check-deps _cache_check
 
 # ── Entry point ───────────────────────────────────────────
@@ -219,6 +222,20 @@ render: $(TAILORED_YAML)
 	@$(MAKE) --no-print-directory $(OUTPUT_PDF)
 
 # ── Utilities ─────────────────────────────────────────────
+# ── Company research ──────────────────────────────────────
+research: guard-COMPANY check-deps | $(BUILD_DIR)
+	@echo "Researching: $(COMPANY) | Role: $(ROLE)"
+	@claude \
+		-p "Research $(COMPANY) thoroughly for a candidate applying for the role of $(ROLE). Cover: company overview, recent news (last 6 months), Glassdoor/Blind culture reviews, interview process, salary range, and any red flags. Search the web. Format as a concise report." \
+		--max-turns 3 \
+		--output-format text \
+		--model $(MODEL) \
+		> $(BUILD_DIR)/research_$(COMPANY).md
+	@echo ""
+	@echo "Research saved: $(BUILD_DIR)/research_$(COMPANY).md"
+	@cat $(BUILD_DIR)/research_$(COMPANY).md
+
+
 clean:
 	rm -rf $(BUILD_DIR)
 	@echo "Cache cleared."
@@ -241,6 +258,9 @@ help:
 	@echo "  make tailor URL=<url>      Fetch + tailor (no PDF)"
 	@echo "  make audit                 Fraud-check current build/tailored.yaml"
 	@echo "  make render                Recompile PDF (skips LLM steps)"
+	@echo "  make research COMPANY=<name> [ROLE=<title>]"
+	@echo "                             Research a company before applying"
+
 	@echo "  make clean                 Wipe build cache"
 	@echo "  make test                  Run unit tests"
 	@echo ""

@@ -101,9 +101,19 @@ $(PATCH_YAML): $(JOB_MD) | $(BUILD_DIR)
 		echo "[2/4] Tailor skipped (cache hit)"; exit 0; \
 	fi
 	@echo "[2/4] Tailoring resume (~30s)..."
+	@{ \
+		echo '<JOB_POSTING>'; \
+		cat $(JOB_MD); \
+		echo '</JOB_POSTING>'; \
+		echo ''; \
+		echo '<RESUME>'; \
+		cat $(RESUME_YAML); \
+		echo '</RESUME>'; \
+		echo ''; \
+		echo 'Produce a YAML patch following your system prompt rules.'; \
+	} > $(BUILD_DIR)/tailor_prompt.txt
 	@claude --bare \
-		-p "$$(printf '<JOB_POSTING>\n%s\n</JOB_POSTING>\n\n<RESUME>\n%s\n</RESUME>\n\nProduce a YAML patch following your system prompt rules.' \
-			"$$(cat $(JOB_MD))" "$$(cat $(RESUME_YAML))")" \
+		-p "$$(cat $(BUILD_DIR)/tailor_prompt.txt)" \
 		--system-prompt-file $(TAILOR_SYS) \
 		--max-turns 1 \
 		--no-session-persistence \
@@ -124,9 +134,17 @@ $(AUDIT_REPORT): $(TAILORED_YAML) | $(BUILD_DIR)
 		echo "[3/4] Audit skipped (cache hit)"; exit 0; \
 	fi
 	@echo "[3/4] Running fraud audit..."
+	@{ \
+		echo '<ORIGINAL>'; \
+		cat $(RESUME_YAML); \
+		echo '</ORIGINAL>'; \
+		echo ''; \
+		echo '<TAILORED>'; \
+		cat $(TAILORED_YAML); \
+		echo '</TAILORED>'; \
+	} > $(BUILD_DIR)/audit_prompt.txt
 	@claude --bare \
-		-p "$$(printf '<ORIGINAL>\n%s\n</ORIGINAL>\n\n<TAILORED>\n%s\n</TAILORED>' \
-			"$$(cat $(RESUME_YAML))" "$$(cat $(TAILORED_YAML))")" \
+		-p "$$(cat $(BUILD_DIR)/audit_prompt.txt)" \
 		--system-prompt-file $(AUDIT_SYS) \
 		--max-turns 1 \
 		--no-session-persistence \
@@ -174,9 +192,15 @@ $(OUTPUT_PDF): $(AUDIT_REPORT) | $(BUILD_DIR)
 				exit 1; \
 			fi; \
 			echo "      Over limit ($$pages pages) -- trimming (attempt $$retries/$(MAX_RETRIES))..."; \
+			{ \
+				echo '<TAILORED_YAML>'; \
+				cat $$current_yaml; \
+				echo '</TAILORED_YAML>'; \
+				echo ''; \
+				echo "The resume compiles to $$pages pages. Trim to fit 2 pages."; \
+			} > $(BUILD_DIR)/trim_prompt.txt; \
 			claude --bare \
-				-p "$$(printf '<TAILORED_YAML>\n%s\n</TAILORED_YAML>\n\nThe resume compiles to %s pages. Trim to fit 2 pages.' \
-					"$$(cat $$current_yaml)" "$$pages")" \
+				-p "$$(cat $(BUILD_DIR)/trim_prompt.txt)" \
 				--system-prompt-file $(TRIM_SYS) \
 				--max-turns 1 \
 				--no-session-persistence \

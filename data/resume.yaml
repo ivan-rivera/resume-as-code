@@ -1,0 +1,375 @@
+# =============================================================
+# resume.yaml — Source of truth for Resume-as-Code pipeline
+# =============================================================
+
+personal:
+  name: "Ivan Rivera"
+  tagline: "ML Specialist · Lead AI Engineer"
+  email: "ivan.s.rivera@gmail.com"
+  phone: "+61449857572"
+  location: "Melbourne, Australia"
+  linkedin_url: "https://www.linkedin.com/in/isrivera/"
+  linkedin_label: "linkedin.com/in/isrivera"
+  github_url: "https://github.com/ivan-rivera"
+  github_label: "github.com/ivan-rivera"
+
+summary: |
+  ML specialist with deep expertise in AI systems, including large language models,
+  reinforcement learning, and applied ML at scale. With over a decade of international
+  experience at globally recognised tech-driven organisations, I bring a rare combination
+  of academic rigour, product sense, leadership, and hands-on engineering skills. I've
+  built and led ML teams, delivered production-grade LLM and RAG applications, and
+  developed sophisticated systems. I thrive at the intersection of research and
+  engineering, with a pragmatic, impact-driven approach and a positive, can-do attitude.
+
+languages:
+  - name: "English"
+    flag: "assets/flags/au.png"
+    level: "100%"
+  - name: "Russian"
+    flag: "assets/flags/ru.png"
+    level: "100%"
+
+skills:
+  - group: "ML & AI"
+    icon: "brain"
+    items:
+      - "LLM"
+      - "RAG"
+      - "Agentic AI"
+      - "Transformers"
+      - "Deep Learning"
+      - "Reinforcement Learning"
+      - "Multi-Armed Bandits"
+      - "NLP"
+      - "A/B Testing"
+      - "Causal Inference"
+      - "Bayesian Inference"
+      - "Ranking & Recommendations"
+      - "Transfer Learning"
+      - "Uplift Modelling"
+      - "Time Series Forecasting"
+      - "Constrained Optimisation"
+      - "TensorFlow / TFX"
+      - "PyTorch"
+      - "scikit-learn"
+      - "XGBoost"
+      - "LangChain"
+      - "Vector DBs"
+      - "MLFlow"
+
+  - group: "Data & Cloud"
+    icon: "cloud"
+    items:
+      - "GCP"
+      - "AWS"
+      - "Azure"
+      - "Databricks"
+      - "Snowflake"
+      - "Apache Spark"
+      - "Apache Beam"
+      - "Kubeflow"
+      - "Dataflow"
+      - "Airflow"
+      - "DBT"
+      - "Terraform"
+      - "Docker"
+      - "Kubernetes"
+      - "Ray Framework"
+
+  - group: "Programming Languages"
+    icon: "code"
+    items:
+      - "Python"
+      - "Scala"
+      - "TypeScript"
+      - "JavaScript"
+      - "SQL"
+      - "Java"
+      - "C#"
+      - "R"
+      - "Kotlin"
+      - "Elixir"
+      - "Bash"
+      - "SAS"
+
+  - group: "Backend & APIs"
+    icon: "server"
+    items:
+      - "FastAPI"
+      - "REST"
+      - "Microservices"
+      - "Nest.js"
+      - "Spring Boot"
+      - "Play! Framework"
+      - "Phoenix"
+      - ".NET Core"
+      - "Distributed Computing"
+      - "CI/CD"
+
+  - group: "Frontend"
+    icon: "display"
+    items:
+      - "React.js"
+      - "Next.js"
+      - "Vue.js"
+      - "Nuxt.js"
+      - "Full-stack Web Development"
+
+  - group: "Data Stores"
+    icon: "database"
+    items:
+      - "PostgreSQL"
+      - "MongoDB"
+      - "Redis"
+      - "Redshift"
+      - "ElasticSearch"
+      - "Logstash"
+
+  - group: "Leadership"
+    icon: "users"
+    items:
+      - "Team Building"
+      - "Recruitment"
+      - "Mentorship"
+      - "Agile / Sprint Planning"
+      - "OKR-driven"
+      - "Technical Roadmap"
+      - "Cross-functional Collaboration"
+      - "Product Development"
+      - "System Design"
+
+experience:
+  - company: "BidOne"
+    company_description: "World's leading e-commerce platform for food services"
+    location: "Auckland, New Zealand"
+    roles:
+      - title: "Lead AI Engineer"
+        start: "September 2024"
+        end: "December 2025"
+    bullets:
+      - "Built a new AI team from the ground up with robust processes for operating"
+      - "Proposed a brand new data platform for the company"
+      - "Architected and implemented a predictive basket feature"
+      - "Implemented a RAG-based LLM voice AI assistant to support sales staff"
+    technologies:
+      - "Scikit-learn"
+      - "MLFlow"
+      - "Azure"
+      - "Databricks"
+      - "Snowflake"
+      - "Fivetran"
+      - "DBT"
+      - "MongoDB"
+      - "FastAPI"
+      - ".NET Core"
+      - "Python"
+      - "C#"
+      - "Swift"
+      - "TypeScript"
+      - "GitHub Copilot"
+      - "Cursor AI"
+      - "VAPI"
+      - "ElevenLabs"
+      - "OpenAI APIs"
+    tags: ["leadership", "technical"]
+
+  - company: "Spotify"
+    company_description: ""
+    location: "Stockholm, Sweden / Amsterdam, Netherlands"
+    roles:
+      - title: "Machine Learning Engineer"
+        start: "February 2023"
+        end: "September 2024"
+      - title: "Machine Learning Engineer"
+        start: "November 2020"
+        end: "January 2022"
+    bullets:
+      - "Improved, tested, and released a new ranking algorithm driving monthly active user growth"
+      - "Led the development of Algorithmic Responsibility within the Subscriptions mission"
+      - "Built a RAG-based LLM that answers questions based on internal data"
+      - "Proposed, designed and implemented a new fraud detection service"
+    technologies:
+      - "TensorFlow"
+      - "TFX"
+      - "PyTorch"
+      - "Scio"
+      - "Luigi"
+      - "Flyte"
+      - "Apache Beam"
+      - "Kubeflow"
+      - "Ray Framework"
+      - "MLFlow"
+      - "GCP"
+      - "Python"
+      - "Scala"
+      - "Java"
+      - "JavaScript"
+      - "OpenAI APIs"
+      - "LangChain"
+    tags: ["technical"]
+
+  - company: "Orion Health"
+    company_description: "Health-tech company improving health outcomes globally"
+    location: "Auckland, New Zealand"
+    roles:
+      - title: "NLP Engineering Manager"
+        start: "February 2022"
+        end: "February 2023"
+    bullets:
+      - "Developed a production-grade client-facing application that extracts medical codes from clinical text"
+      - "Assembled a cross-functional team and established an agile process for delivering outcomes"
+      - "Drove cross-team collaboration to enable the delivery of our system to a customer"
+    technologies:
+      - "AWS"
+      - "SpaCy"
+      - "FastAPI"
+      - "React"
+      - "FAISS"
+    tags: ["leadership", "technical"]
+
+  - company: "Zalando SE"
+    company_description: "E-commerce company specialising in fashion and lifestyle (Zalon product)"
+    location: "Berlin, Germany"
+    roles:
+      - title: "Applied Scientist"
+        start: "July 2019"
+        end: "July 2020"
+    bullets:
+      - "Improved performance of a model that personalises customers' website experience"
+      - "Collaborated on designing and implementing an algorithmic customer-to-stylist matchmaking service that achieved a substantial uplift in business KPIs"
+    technologies: []
+    tags: ["technical"]
+
+  - company: "GetYourGuide"
+    company_description: "Online platform and marketplace for tour guides and excursions"
+    location: "Berlin, Germany"
+    roles:
+      - title: "Senior Data Scientist"
+        start: "June 2018"
+        end: "May 2019"
+    bullets:
+      - "Implemented a new, improved bidding model"
+      - "Improved and standardised internal documentation practices"
+    technologies:
+      - "Google Ads"
+      - "Databricks"
+      - "Apache Spark"
+    tags: ["technical"]
+
+  - company: "Qrious"
+    company_description: "Location analytics as a service"
+    location: "Auckland, New Zealand"
+    roles:
+      - title: "Senior Data Scientist"
+        start: "December 2016"
+        end: "May 2018"
+      - title: "Data Scientist"
+        start: "May 2015"
+        end: "December 2016"
+    bullets:
+      - "Became the youngest person promoted to Senior Data Scientist at Qrious out of over 10 peers"
+      - "Significantly contributed towards the Voyager product enabling tourist operators to gain insights on prospective customers"
+      - "Developed and deployed a recommendation engine for the CRM team of a large bank"
+      - "In collaboration with McKinsey, developed and deployed a forecasting model for a global company"
+    technologies:
+      - "SAS"
+      - "Python"
+      - "R"
+      - "Scala"
+    tags: ["technical"]
+
+  - company: "Bank of New Zealand"
+    company_description: ""
+    location: "Auckland, New Zealand"
+    roles:
+      - title: "Credit Risk Modeller"
+        start: "August 2014"
+        end: "March 2015"
+      - title: "Customer Insights Analyst"
+        start: "February 2013"
+        end: "August 2014"
+      - title: "Intern, Customer Insights"
+        start: "December 2012"
+        end: "February 2013"
+    bullets:
+      - "Pioneered NLP initiatives at BNZ"
+      - "Won the Bright Spark BNZ Award for developing enhancements to Operational Risk reporting adopted across the entire NAB group"
+      - "Established myself as a SAS expert and trained SAS programming to a team of 6 people"
+      - "Delivered an internship segmentation project ahead of schedule, earning a full-time offer"
+    technologies:
+      - "SAS"
+    tags: ["technical"]
+
+education:
+  - degree: "MSc in Statistics"
+    grade: "1st Class"
+    institution: "University of Auckland"
+    location: "Auckland, New Zealand"
+    year: "2016"
+
+  - degree: "BSc (Honours) in Statistics"
+    grade: ""
+    institution: "University of Auckland"
+    location: "Auckland, New Zealand"
+    year: "2014"
+
+  - degree: "BCom in Marketing"
+    grade: ""
+    institution: "University of Auckland"
+    location: "Auckland, New Zealand"
+    year: "2012"
+
+  - degree: "Secondary Education NCEA Level 1-3"
+    grade: ""
+    institution: "Glendowie College"
+    location: "Auckland, New Zealand"
+    year: "2007"
+
+awards_and_publications:
+  - type: "project"
+    icon: "globe"
+    text: "SleepRescue.org — Web, Stockholm, Sweden, 2021"
+
+  - type: "award"
+    icon: "trophy"
+    text: "Best Paper Award HIKM, Canberra, AU, 2016"
+
+  - type: "publication"
+    icon: "book"
+    text: "Quantifying Mood of Health Forums — HIKM, ACM, Auckland, NZ, 2016"
+
+  - type: "project"
+    icon: "code"
+    text: "RedditExtractor R Package — CRAN & MRAN, Auckland, NZ, 2015"
+
+  - type: "award"
+    icon: "medal"
+    text: "Competent Communicator Award, Toastmasters, Auckland, NZ, 2014"
+
+  - type: "award"
+    icon: "medal"
+    text: "Competent Leadership Award, Toastmasters, Auckland, NZ, 2014"
+
+extra_qualifications:
+  - "Tableau Fundamentals & Advanced, with Montage"
+  - "Hadoop Developer Training, with Cloudera"
+  - "Agile Fundamentals with Nomad8"
+  - "Snowflake Fundamentals, with Snowflake"
+  - "Various courses covering LLM, ML, Infra, Web, iOS & Android Development"
+
+interests:
+  - "Chess"
+  - "Tennis"
+  - "Piano"
+  - "Public Speaking"
+  - "Fitness"
+  - "Reading"
+  - "Dancing"
+  - "Singing"
+  - "Web Development"
+  - "Hiking"
+  - "Travel"
+  - "History"
+  - "Physics"
+  - "Philosophy"

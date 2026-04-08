@@ -1,0 +1,281 @@
+TASK: Convert resume.md to resume.yaml
+======================================
+
+Source file:  /Users/ivr/Documents/projects/armory/rac/resume.md
+Output file:  /Users/ivr/Documents/projects/armory/rac/data/resume.yaml
+
+You are converting a markdown resume into a structured YAML file that will serve
+as the permanent source of truth for a Resume-as-Code pipeline. The YAML will be
+loaded directly by a Typst template (lavandula v0.1.1) via its native yaml() loader,
+and patched by an LLM to produce tailored versions for specific job postings.
+
+CRITICAL RULES
+--------------
+1. Do NOT invent, fabricate, or add any content not present in resume.md.
+2. Do NOT remove any content from resume.md — every role, bullet, skill,
+   award, publication, and education entry must be preserved.
+3. One exception to rule 2: consolidate the two Spotify tenures (2020-2022
+   and 2023-2024) into a single experience entry (see schema below).
+4. Preserve all dates, metrics, company names, and proper nouns exactly.
+5. Output must be valid YAML (test with `python3 -c "import yaml; yaml.safe_load(open('data/resume.yaml'))"`)
+
+PERSONAL DETAILS TO USE
+-----------------------
+These are NOT in resume.md — include them exactly as given:
+
+  name:      Ivan Rivera
+  email:     ivan.s.rivera@gmail.com
+  linkedin:  https://www.linkedin.com/in/isrivera/
+  github:    https://github.com/ivan-rivera
+  location:  Melbourne, Australia
+  phone:     "+61449857572"   # wrap in quotes — leading + confuses YAML parsers
+
+LANGUAGE DATA TO USE
+--------------------
+These are NOT in resume.md — include them exactly as given:
+
+  - name: English
+    flag: assets/flags/au.png
+    level: "100%"
+
+  - name: Russian
+    flag: assets/flags/ru.png
+    level: "100%"
+
+COMPLETE YAML SCHEMA
+--------------------
+Produce exactly this structure. Do not add or rename top-level keys.
+
+```yaml
+# =============================================================
+# resume.yaml — Source of truth for Resume-as-Code pipeline
+# =============================================================
+
+personal:
+  name: "Ivan Rivera"
+  tagline: "ML Specialist | Lead AI Engineer"      # derive from profile section
+  email: "ivan.s.rivera@gmail.com"
+  phone: "+61449857572"
+  location: "Melbourne, Australia"
+  linkedin_url: "https://www.linkedin.com/in/isrivera/"
+  linkedin_label: "linkedin.com/in/isrivera"       # display text (no https://)
+  github_url: "https://github.com/ivan-rivera"
+  github_label: "github.com/ivan-rivera"           # display text (no https://)
+
+summary: |
+  [Copy the full "Personal profile" paragraph from resume.md verbatim, as a
+  YAML block scalar. Do not paraphrase or shorten.]
+
+languages:
+  - name: "English"
+    flag: "assets/flags/au.png"
+    level: "100%"
+  - name: "Russian"
+    flag: "assets/flags/ru.png"
+    level: "100%"
+
+skills:
+  # Group the full "Tools and Technologies", "Languages", and "Machine Learning"
+  # and "Software Engineering" sections into logical skill groups.
+  # Use 5-7 groups. Suggested groupings (adjust if needed):
+  #   - ML & AI         (ML techniques, LLM, RAG, frameworks: TF, PyTorch, sklearn...)
+  #   - Data & Cloud    (Spark, Beam, GCP, AWS, Azure, Databricks, Snowflake...)
+  #   - Languages       (Python, Scala, TypeScript, SQL, R, etc.)
+  #   - Backend & APIs  (FastAPI, Spring Boot, Nest.js, Docker, Kubernetes...)
+  #   - Frontend        (React, Vue, Next.js, Nuxt.js...)
+  #   - Data Stores     (Postgres, Redis, MongoDB, ElasticSearch, Vector DBs...)
+  #   - Leadership      (From "Business Knowledge" section)
+  - group: "ML & AI"
+    icon: "brain"                 # Font Awesome 6 icon name (no fa- prefix)
+    items:
+      - "..."                     # list every relevant item
+
+  - group: "Data & Cloud"
+    icon: "cloud"
+    items:
+      - "..."
+
+  # ... continue for all groups
+
+experience:
+  # One entry per employer. Exception: merge the two Spotify stints (see below).
+  # ORDER: reverse-chronological (most recent first).
+
+  - company: "BidOne"
+    company_description: "World's leading e-commerce platform for food services"
+    location: "Auckland, New Zealand"
+    roles:
+      - title: "Lead AI Engineer"
+        start: "September 2024"
+        end: "December 2025"
+    bullets:
+      - "..."                     # copy Achievements verbatim, one bullet per item
+    technologies:
+      - "..."                     # copy Technologies list verbatim
+    tags: ["leadership", "technical"]   # always include both tags
+
+  - company: "Spotify"
+    company_description: ""       # leave blank — Spotify needs no description
+    location: "Stockholm, Sweden / Amsterdam, Netherlands"
+    roles:
+      # CONSOLIDATE both tenures into one entry with two role objects:
+      - title: "Machine Learning Engineer"
+        start: "February 2023"
+        end: "September 2024"
+      - title: "Machine Learning Engineer"
+        start: "November 2020"
+        end: "January 2022"
+    bullets:
+      - "..."                     # combine Achievements from BOTH tenures, no duplicates
+    technologies:
+      - "..."                     # union of both Technologies lists, deduplicated
+    tags: ["technical"]
+
+  - company: "Orion Health"
+    company_description: "Health-tech company improving health outcomes globally"
+    location: "Auckland, New Zealand"
+    roles:
+      - title: "NLP Engineering Manager"
+        start: "February 2022"
+        end: "February 2023"
+    bullets:
+      - "..."
+    technologies:
+      - "..."
+    tags: ["leadership", "technical"]
+
+  - company: "Zalando SE"
+    company_description: "E-commerce company specialising in fashion and lifestyle (Zalon product)"
+    location: "Berlin, Germany"
+    roles:
+      - title: "Applied Scientist"
+        start: "July 2019"
+        end: "July 2020"
+    bullets:
+      - "..."
+    technologies: []              # not listed in resume.md — leave empty
+    tags: ["technical"]
+
+  - company: "GetYourGuide"
+    company_description: "Online platform and marketplace for tour guides and excursions"
+    location: "Berlin, Germany"
+    roles:
+      - title: "Senior Data Scientist"
+        start: "June 2018"
+        end: "May 2019"
+    bullets:
+      - "..."
+    technologies: []
+    tags: ["technical"]
+
+  - company: "Qrious"
+    company_description: "Location analytics as a service"
+    location: "Auckland, New Zealand"
+    roles:
+      - title: "Senior Data Scientist"
+        start: "December 2016"
+        end: "May 2018"
+      - title: "Data Scientist"
+        start: "May 2015"
+        end: "December 2016"
+    bullets:
+      - "..."                     # combine Achievements from both Qrious roles
+    technologies: []
+    tags: ["technical"]
+
+  - company: "Bank of New Zealand"
+    company_description: ""
+    location: "Auckland, New Zealand"
+    roles:
+      - title: "Credit Risk Modeller"
+        start: "August 2014"
+        end: "March 2015"
+      - title: "Customer Insights Analyst"
+        start: "February 2013"
+        end: "August 2014"
+      - title: "Intern, Customer Insights"
+        start: "December 2012"
+        end: "February 2013"
+    bullets:
+      - "..."                     # combine Achievements from all three BNZ roles
+    technologies: []
+    tags: ["technical"]
+
+education:
+  # Reverse-chronological. Include all four degrees.
+  - degree: "MSc in Statistics"
+    grade: "1st Class"
+    institution: "University of Auckland"
+    location: "Auckland, New Zealand"
+    year: "2016"
+
+  - degree: "BSc (Honours) in Statistics"
+    grade: ""
+    institution: "University of Auckland"
+    location: "Auckland, New Zealand"
+    year: "2014"
+
+  - degree: "BCom in Marketing"
+    grade: ""
+    institution: "University of Auckland"
+    location: "Auckland, New Zealand"
+    year: "2012"
+
+  - degree: "Secondary Education NCEA Level 1-3"
+    grade: ""
+    institution: "Glendowie College"
+    location: "Auckland, New Zealand"
+    year: "2007"
+
+awards_and_publications:
+  # Include all items from "Awards, Projects and Publications" section.
+  # Use type: "award", "publication", or "project" for each.
+  - type: "project"
+    icon: "globe"
+    text: "SleepRescue.org — Web, Stockholm, Sweden, 2021"
+
+  - type: "award"
+    icon: "trophy"
+    text: "Best Paper Award HIKM, Canberra, AU, 2016"
+
+  - type: "publication"
+    icon: "book"
+    text: "Quantifying Mood of Health Forums — HIKM, ACM, Auckland, NZ, 2016"
+
+  - type: "project"
+    icon: "code"
+    text: "RedditExtractor R Package — CRAN & MRAN, Auckland, NZ, 2015"
+
+  - type: "award"
+    icon: "medal"
+    text: "Competent Communicator Award, Toastmasters, Auckland, NZ, 2014"
+
+  - type: "award"
+    icon: "medal"
+    text: "Competent Leadership Award, Toastmasters, Auckland, NZ, 2014"
+
+extra_qualifications:
+  # Copy the "Extra Qualifications" list verbatim, one item per entry.
+  - "Tableau Fundamentals & Advanced, with Montage"
+  - "..."
+
+interests:
+  # Copy the "Interests" list verbatim.
+  - "Chess"
+  - "..."
+```
+
+AFTER WRITING THE FILE
+-----------------------
+1. Validate the YAML parses cleanly:
+   python3 -c "import yaml; data = yaml.safe_load(open('data/resume.yaml')); print('OK —', len(data['experience']), 'experience entries')"
+
+2. Verify the Spotify entry has exactly 2 role objects (both tenures consolidated).
+
+3. Verify no content from resume.md has been lost — every company, title, bullet,
+   and achievement must appear somewhere in the YAML.
+
+4. Create the data/ directory if it does not exist before writing the file.
+
+DO NOT create any other files. DO NOT modify resume.md. DO NOT commit anything.
+Just produce data/resume.yaml and validate it parses.

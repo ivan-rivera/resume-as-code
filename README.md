@@ -92,6 +92,6 @@ Two layers:
 
 **PDF > 2 pages:** The pipeline auto-trims up to 2 times. If it still fails, follow the suggested manual cuts printed in the error message, edit `data/resume.yaml`, and re-run.
 
-**Font Awesome icons missing (blank boxes):** Install Font Awesome 6 Desktop OTF fonts from [fontawesome.com/download](https://fontawesome.com/download). Compilation still succeeds without them — icons just appear blank.
+**Font Awesome icons missing (? characters):** Install Font Awesome 7 Free Desktop `.otf` files from [fontawesome.com/download](https://fontawesome.com/download) — `Free-Regular`, `Free-Solid`, and `Brands`. FA6 will not work; `@preview/fontawesome:0.6.0` requires FA7.
 
 **Fira Sans font warning:** Install Fira Sans from [Google Fonts](https://fonts.google.com/specimen/Fira+Sans) for proper rendering. Also compiles without it.

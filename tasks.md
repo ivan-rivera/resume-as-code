@@ -1,6 +1,7 @@
 # Tasks
 
 - [ ] Find a way to test compilation step
+- [ ] Add company logos
 - [ ] Render the template correctly and resolve the question mark rendering
 - [ ] Fix the overzealous guardrail problem (plus patch rather than fail)
 - [ ] Remove languages from the resume entirely

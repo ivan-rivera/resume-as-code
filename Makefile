@@ -34,7 +34,7 @@ TRIM_SYS      := prompts/trim_system.txt
 APPLY_PATCH   := python3 scripts/apply_patch.py
 
 # ── Targets ───────────────────────────────────────────────
-.PHONY: resume fetch tailor audit render clean test help research \
+.PHONY: resume fetch tailor audit render clean test compile-test help research \
         check-deps _cache_check
 
 # ── Entry point ───────────────────────────────────────────
@@ -240,6 +240,12 @@ clean:
 	rm -rf $(BUILD_DIR)
 	@echo "Cache cleared."
 
+compile-test:
+	@mkdir -p $(BUILD_DIR)
+	@cp $(RESUME_YAML) $(TAILORED_YAML)
+	@typst compile $(TYPST_TPL) $(OUTPUT_PDF)
+	@echo "compile-test passed: $(OUTPUT_PDF)"
+
 test:
 	python3 -m pytest tests/ -v
 
@@ -261,6 +267,7 @@ help:
 	@echo "  make research COMPANY=<name> [ROLE=<title>]"
 	@echo "                             Research a company before applying"
 
+	@echo "  make compile-test          Compile PDF from unmodified resume.yaml (no LLM)"
 	@echo "  make clean                 Wipe build cache"
 	@echo "  make test                  Run unit tests"
 	@echo ""

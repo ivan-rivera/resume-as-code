@@ -26,7 +26,7 @@ Entry point: `make resume URL=<url>`
 ## Lavandula Template Notes
 
 - Requires Typst ≥ 0.14.0 (skill-levels progress bars broken in 0.13.x).
-- Font Awesome 6 Desktop must be installed locally — missing fonts show blank icon boxes silently, but compilation succeeds.
+- Font Awesome 7 Free Desktop fonts must be installed locally (download `.otf` files from fontawesome.com/download — install `Free-Regular`, `Free-Solid`, `Brands`). The `@preview/fontawesome:0.6.0` package requires FA7; FA6 will not work. Missing fonts render as `?` characters.
 - Fira Sans font should be installed — compilation succeeds without it but text falls back to system fonts.
 - Language fluency flags are local PNGs in `assets/flags/` (MIT-licensed, from gosquared/flags).
 - Multi-role entries (Spotify two tenures, BNZ three roles) use a single `company` entry with multiple `roles` objects — saves ~2cm vertical space.

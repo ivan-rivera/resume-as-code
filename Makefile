@@ -32,16 +32,50 @@ AUDIT_SYS     := prompts/audit_system.txt
 CORRECT_SYS   := prompts/correct_system.txt
 TRIM_SYS      := prompts/trim_system.txt
 
+COVER           ?=
+COVER_LETTER_SYS  := prompts/cover_letter_system.txt
+COVER_LETTER_TPL  := cover_letter.typ
+COVER_LETTER_DATA := $(BUILD_DIR)/cover_letter_data.yaml
+COVER_LETTER_MD   := $(BUILD_DIR)/cover_letter.md
+COVER_LETTER_PDF  := $(BUILD_DIR)/cover_letter.pdf
+
+RENDER_COVER  := python3 scripts/render_cover_letter.py
+
+# Validate COVER value at parse time
+ifneq ($(COVER),)
+ifneq ($(COVER),md)
+ifneq ($(COVER),pdf)
+$(error COVER must be 'md' or 'pdf', got '$(COVER)'. Example: make resume URL=... COVER=pdf)
+endif
+endif
+endif
+
+# Build the conditional dependency list
+_cover_targets :=
+ifeq ($(COVER),md)
+  _cover_targets += $(COVER_LETTER_MD)
+endif
+ifeq ($(COVER),pdf)
+  _cover_targets += $(COVER_LETTER_PDF)
+endif
+
 APPLY_PATCH   := python3 scripts/apply_patch.py
 
 # ── Targets ───────────────────────────────────────────────
 .PHONY: resume fetch tailor audit render clean test compile-test help research \
-        check-deps _cache_check
+        check-deps _cache_check cover
 
 # ── Entry point ───────────────────────────────────────────
-resume: guard-URL check-deps _cache_check $(OUTPUT_PDF)
+resume: guard-URL check-deps _cache_check $(OUTPUT_PDF) $(_cover_targets)
 	@echo ""
 	@echo "Done: $(OUTPUT_PDF)"
+	@if [ -n "$(COVER)" ]; then \
+		if [ "$(COVER)" = "pdf" ]; then \
+			echo "Cover: $(COVER_LETTER_PDF)"; \
+		else \
+			echo "Cover: $(COVER_LETTER_MD)"; \
+		fi; \
+	fi
 
 # ── Dependency guard ──────────────────────────────────────
 check-deps:
@@ -195,6 +229,53 @@ $(AUDIT_REPORT): $(TAILORED_YAML) | $(BUILD_DIR)
 
 audit: $(AUDIT_REPORT)
 
+# ── Step 5: Generate cover letter content ─────────────────
+$(COVER_LETTER_DATA): $(AUDIT_REPORT) $(JOB_MD) | $(BUILD_DIR)
+	@if [ -f "$@" ] && [ "$@" -nt "$(TAILORED_YAML)" ]; then \
+		echo "[5] Cover letter skipped (cache hit)"; exit 0; \
+	fi
+	@echo "[5] Generating cover letter (~20s)..."
+	@{ \
+		echo '<JOB_POSTING>'; \
+		cat $(JOB_MD); \
+		echo '</JOB_POSTING>'; \
+		echo ''; \
+		echo '<TAILORED_RESUME>'; \
+		cat $(TAILORED_YAML); \
+		echo '</TAILORED_RESUME>'; \
+		echo ''; \
+		echo 'Write the cover letter following your system prompt rules.'; \
+	} > $(BUILD_DIR)/cover_letter_prompt.txt
+	@claude -p "$$(cat $(BUILD_DIR)/cover_letter_prompt.txt)" \
+		--system-prompt-file $(COVER_LETTER_SYS) \
+		--max-turns 1 \
+		--no-session-persistence \
+		--output-format text \
+		--model $(MODEL) \
+		| awk '/^recipient:/{p=1} p' \
+		> $@
+	@test -s $@ || { echo "ERROR: Cover letter LLM returned empty output"; rm -f $@; exit 1; }
+	@echo "      Cover letter content generated"
+
+$(COVER_LETTER_MD): $(COVER_LETTER_DATA) | $(BUILD_DIR)
+	@if [ -f "$@" ] && [ "$@" -nt "$(COVER_LETTER_DATA)" ]; then \
+		echo "[6] Cover letter MD skipped (cache hit)"; exit 0; \
+	fi
+	@echo "[6] Rendering cover letter Markdown..."
+	@$(RENDER_COVER) $(COVER_LETTER_DATA) $@
+	@echo "      Written: $@"
+
+$(COVER_LETTER_PDF): $(COVER_LETTER_DATA) | $(BUILD_DIR)
+	@if [ -f "$@" ] && [ "$@" -nt "$(COVER_LETTER_DATA)" ]; then \
+		echo "[6] Cover letter PDF skipped (cache hit)"; exit 0; \
+	fi
+	@echo "[6] Compiling cover letter PDF..."
+	@typst compile $(COVER_LETTER_TPL) $@
+	@echo "      Written: $@"
+
+cover: guard-URL _cache_check $(COVER_LETTER_DATA)
+	@test -n "$(COVER)" || { echo "ERROR: COVER is required. Use COVER=md or COVER=pdf"; exit 1; }
+
 # ── Step 4: Compile + page check ─────────────────────────
 $(OUTPUT_PDF): $(AUDIT_REPORT) | $(BUILD_DIR)
 	@echo "[4/4] Compiling PDF..."
@@ -285,18 +366,21 @@ help:
 	@echo "Resume-as-Code Pipeline"
 	@echo ""
 	@echo "Usage:"
-	@echo "  make resume URL=<url>      Full pipeline (fetch -> tailor -> audit -> PDF)"
-	@echo "  make fetch  URL=<url>      Extract job posting only"
-	@echo "  make tailor URL=<url>      Fetch + tailor (no PDF)"
-	@echo "  make audit                 Fraud-check current build/tailored.yaml"
-	@echo "  make render                Recompile PDF (skips LLM steps)"
+	@echo "  make resume URL=<url>               Full pipeline (fetch -> tailor -> audit -> PDF)"
+	@echo "  make resume URL=<url> COVER=md      + cover letter as Markdown"
+	@echo "  make resume URL=<url> COVER=pdf     + cover letter as PDF"
+	@echo "  make fetch  URL=<url>               Extract job posting only"
+	@echo "  make tailor URL=<url>               Fetch + tailor (no PDF)"
+	@echo "  make audit                          Fraud-check current build/tailored.yaml"
+	@echo "  make render                         Recompile PDF (skips LLM steps)"
 	@echo "  make research COMPANY=<name> [ROLE=<title>]"
-	@echo "                             Research a company before applying"
-
-	@echo "  make compile-test          Compile PDF from unmodified resume.yaml (no LLM)"
-	@echo "  make clean                 Wipe build cache"
-	@echo "  make test                  Run unit tests"
+	@echo "                                      Research a company before applying"
+	@echo "  make compile-test                   Compile PDF from unmodified resume.yaml (no LLM)"
+	@echo "  make clean                          Wipe build cache"
+	@echo "  make test                           Run unit tests"
 	@echo ""
 	@echo "Options:"
-	@echo "  URL=path/to/file.txt  Pass a local file instead of a URL"
-	@echo "  MODEL=claude-opus-4-6 Override the Claude model"
+	@echo "  URL=path/to/file.txt   Pass a local file instead of a URL"
+	@echo "  MODEL=claude-opus-4-6  Override the Claude model"
+	@echo "  COVER=md               Generate cover letter as Markdown"
+	@echo "  COVER=pdf              Generate cover letter as PDF"

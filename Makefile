@@ -231,7 +231,7 @@ audit: $(AUDIT_REPORT)
 
 # ── Step 5: Generate cover letter content ─────────────────
 $(COVER_LETTER_DATA): $(AUDIT_REPORT) $(JOB_MD) | $(BUILD_DIR)
-	@if [ -f "$@" ] && [ "$@" -nt "$(TAILORED_YAML)" ]; then \
+	@if [ -f "$@" ] && [ "$@" -nt "$(AUDIT_REPORT)" ]; then \
 		echo "[5] Cover letter skipped (cache hit)"; exit 0; \
 	fi
 	@echo "[5] Generating cover letter (~20s)..."
@@ -265,7 +265,7 @@ $(COVER_LETTER_MD): $(COVER_LETTER_DATA) | $(BUILD_DIR)
 	@$(RENDER_COVER) $(COVER_LETTER_DATA) $@
 	@echo "      Written: $@"
 
-$(COVER_LETTER_PDF): $(COVER_LETTER_DATA) | $(BUILD_DIR)
+$(COVER_LETTER_PDF): $(COVER_LETTER_DATA) $(COVER_LETTER_TPL) | $(BUILD_DIR)
 	@if [ -f "$@" ] && [ "$@" -nt "$(COVER_LETTER_DATA)" ]; then \
 		echo "[6] Cover letter PDF skipped (cache hit)"; exit 0; \
 	fi
@@ -273,8 +273,7 @@ $(COVER_LETTER_PDF): $(COVER_LETTER_DATA) | $(BUILD_DIR)
 	@typst compile $(COVER_LETTER_TPL) $@
 	@echo "      Written: $@"
 
-cover: guard-URL _cache_check $(COVER_LETTER_DATA)
-	@test -n "$(COVER)" || { echo "ERROR: COVER is required. Use COVER=md or COVER=pdf"; exit 1; }
+cover: guard-URL guard-COVER _cache_check $(COVER_LETTER_DATA) $(_cover_targets)
 
 # ── Step 4: Compile + page check ─────────────────────────
 $(OUTPUT_PDF): $(AUDIT_REPORT) | $(BUILD_DIR)

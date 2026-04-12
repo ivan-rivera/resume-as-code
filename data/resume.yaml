@@ -22,13 +22,7 @@ summary: |
   developed sophisticated systems. I thrive at the intersection of research and
   engineering, with a pragmatic, impact-driven approach and a positive, can-do attitude.
 
-languages:
-  - name: "English"
-    flag: "assets/flags/au.png"
-    level: "100%"
-  - name: "Russian"
-    flag: "assets/flags/ru.png"
-    level: "100%"
+languages: []
 
 skills:
   - group: "ML & AI"
@@ -141,6 +135,7 @@ skills:
 
 experience:
   - company: "BidOne"
+    logo: "assets/logos/bidone.png"
     company_description: "World's leading e-commerce platform for food services"
     location: "Auckland, New Zealand"
     roles:
@@ -175,6 +170,7 @@ experience:
     tags: ["leadership", "technical"]
 
   - company: "Spotify"
+    logo: "assets/logos/spotify.png"
     company_description: ""
     location: "Stockholm, Sweden / Amsterdam, Netherlands"
     roles:
@@ -210,6 +206,7 @@ experience:
     tags: ["technical"]
 
   - company: "Orion Health"
+    logo: "assets/logos/orion_health.png"
     company_description: "Health-tech company improving health outcomes globally"
     location: "Auckland, New Zealand"
     roles:
@@ -229,6 +226,7 @@ experience:
     tags: ["leadership", "technical"]
 
   - company: "Zalando SE"
+    logo: "assets/logos/zalando.png"
     company_description: "E-commerce company specialising in fashion and lifestyle (Zalon product)"
     location: "Berlin, Germany"
     roles:
@@ -242,6 +240,7 @@ experience:
     tags: ["technical"]
 
   - company: "GetYourGuide"
+    logo: "assets/logos/getyourguide.png"
     company_description: "Online platform and marketplace for tour guides and excursions"
     location: "Berlin, Germany"
     roles:
@@ -258,6 +257,7 @@ experience:
     tags: ["technical"]
 
   - company: "Qrious"
+    logo: "assets/logos/qrious.png"
     company_description: "Location analytics as a service"
     location: "Auckland, New Zealand"
     roles:
@@ -280,6 +280,7 @@ experience:
     tags: ["technical"]
 
   - company: "Bank of New Zealand"
+    logo: "assets/logos/bnz.png"
     company_description: ""
     location: "Auckland, New Zealand"
     roles:

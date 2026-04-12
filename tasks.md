@@ -1,11 +1,7 @@
 # Tasks
 
-- [ ] Find a way to test compilation step
-- [ ] Add company logos
-- [ ] Render the template correctly and resolve the question mark rendering
-- [ ] Fix the overzealous guardrail problem (plus patch rather than fail)
-- [ ] Remove languages from the resume entirely
 - [ ] Find a way to cleanly separate the resume into multiple pages
+- [ ] Pack more content into the PDF
 - [ ] Parametrise template selection
 - [ ] Review the ground truth file and make sure that no data was truncated
 - [ ] Implement job report target (resume fit, company standing, interview tips)

@@ -25,6 +25,35 @@
   items.map(b => (icon: "circle-check", text: b))
 )
 
+// Experience entry with an optional company logo inline with the title.
+// The logo sits on the same line as the company/role heading; body runs full-width below.
+#let logo-section-element(title: "", info: "", logo: none, body) = {
+  let logo-h = 2.1em   // scales with font size; tweak if needed
+  let title-content = {
+    if logo != none {
+      box(height: logo-h, baseline: 25%, image(logo, height: 100%))
+      h(5pt)
+    }
+    text(weight: "semibold", title)
+  }
+  block(
+    inset: (top: 3pt),
+    width: 100%,
+    below: 1.7em,
+    {
+      grid(
+        columns: (1fr, auto),
+        align: (left + horizon, right + horizon),
+        title-content,
+        text(size: 7pt, info),
+      )
+      v(4pt)
+      set par(justify: true, spacing: 1em)
+      body
+    },
+  )
+}
+
 #let fmt-roles(roles) = {
   if roles.len() == 1 {
     roles.at(0).start + " – " + roles.at(0).end
@@ -84,10 +113,12 @@
           job.company + " — " + job.roles.at(0).title
         }
         let info-text = fmt-roles(job.roles) + " · " + job.location
+        let logo-path = if "logo" in job { job.logo } else { none }
 
-        section-element(
+        logo-section-element(
           title: title-text,
           info:  [_#info-text _],
+          logo:  logo-path,
           {
             if multi {
               for r in job.roles {

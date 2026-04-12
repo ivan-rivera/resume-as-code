@@ -143,8 +143,10 @@ experience:
         start: "September 2024"
         end: "December 2025"
     bullets:
-      - "Built a new AI team from the ground up with robust processes for operating"
-      - "Proposed a brand new data platform for the company"
+      - "Built and led a new AI team from the ground up — recruited members, defined roadmap, and established operating processes"
+      - "Identified high-impact use cases, developed business cases, and owned architecture through to delivery"
+      - "Proposed and architected a new company-wide data platform with a full AI/ML tooling suite"
+      - "Drove LLM adoption across the organisation and implemented A/B testing capabilities"
       - "Architected and implemented a predictive basket feature"
       - "Implemented a RAG-based LLM voice AI assistant to support sales staff"
     technologies:
@@ -181,10 +183,12 @@ experience:
         start: "November 2020"
         end: "January 2022"
     bullets:
+      - "Built, maintained, and evolved ML messaging multi-armed bandit services"
+      - "Conducted A/B testing, drove product development, and mentored junior team members"
       - "Improved, tested, and released a new ranking algorithm driving monthly active user growth"
       - "Led the development of Algorithmic Responsibility within the Subscriptions mission"
       - "Built a RAG-based LLM that answers questions based on internal data"
-      - "Proposed, designed and implemented a new fraud detection service"
+      - "Proposed, designed, and implemented a new fraud detection service"
     technologies:
       - "TensorFlow"
       - "TFX"
@@ -214,9 +218,9 @@ experience:
         start: "February 2022"
         end: "February 2023"
     bullets:
+      - "Led a team of developers and ML specialists — managed recruitment and mentored junior engineers"
       - "Developed a production-grade client-facing application that extracts medical codes from clinical text"
-      - "Assembled a cross-functional team and established an agile process for delivering outcomes"
-      - "Drove cross-team collaboration to enable the delivery of our system to a customer"
+      - "Assembled a cross-functional team, established agile delivery processes, and drove cross-team collaboration to deliver to a customer"
     technologies:
       - "AWS"
       - "SpaCy"
@@ -234,6 +238,8 @@ experience:
         start: "July 2019"
         end: "July 2020"
     bullets:
+      - "Researched, prototyped, and maintained ML applications within a cross-functional microservices and backend integration team"
+      - "Coordinated multiple projects, contributed to team strategy, and assisted with recruitment and junior staff mentoring"
       - "Improved performance of a model that personalises customers' website experience"
       - "Collaborated on designing and implementing an algorithmic customer-to-stylist matchmaking service that achieved a substantial uplift in business KPIs"
     technologies: []
@@ -248,6 +254,9 @@ experience:
         start: "June 2018"
         end: "May 2019"
     bullets:
+      - "Implemented ML software to optimise algorithmic SEM bidding with Google Ads"
+      - "Designed and executed A/B tests to assess the impact of algorithmic decisions"
+      - "Actively assessed data science recruits"
       - "Implemented a new, improved bidding model"
       - "Improved and standardised internal documentation practices"
     technologies:
@@ -269,6 +278,9 @@ experience:
         end: "December 2016"
     bullets:
       - "Became the youngest person promoted to Senior Data Scientist at Qrious out of over 10 peers"
+      - "Built data pipelines and ML algorithms on geospatial data within cross-functional location analytics product teams"
+      - "Developed and integrated ML algorithms for external clients across industries (SAS, Python, R, Scala)"
+      - "Assessed recruits and supported multiple junior data scientists"
       - "Significantly contributed towards the Voyager product enabling tourist operators to gain insights on prospective customers"
       - "Developed and deployed a recommendation engine for the CRM team of a large bank"
       - "In collaboration with McKinsey, developed and deployed a forecasting model for a global company"
@@ -296,6 +308,8 @@ experience:
     bullets:
       - "Pioneered NLP initiatives at BNZ"
       - "Won the Bright Spark BNZ Award for developing enhancements to Operational Risk reporting adopted across the entire NAB group"
+      - "Developed credit risk models (PD, LGD, EAD) and coordinated their governance in compliance with Basel Accord requirements"
+      - "Supported CRM direct marketing through statistical customer targeting models and text analytics for the Complaints team"
       - "Established myself as a SAS expert and trained SAS programming to a team of 6 people"
       - "Delivered an internship segmentation project ahead of schedule, earning a full-time offer"
     technologies:

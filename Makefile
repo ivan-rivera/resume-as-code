@@ -252,7 +252,7 @@ $(COVER_LETTER_DATA): $(AUDIT_REPORT) $(JOB_MD) | $(BUILD_DIR)
 		--no-session-persistence \
 		--output-format text \
 		--model $(MODEL) \
-		| awk '/^recipient:/{p=1} p' \
+		| awk '/^```/{if(p)exit} /^recipient:/{p=1} p' \
 		> $@
 	@test -s $@ || { echo "ERROR: Cover letter LLM returned empty output"; rm -f $@; exit 1; }
 	@echo "      Cover letter content generated"

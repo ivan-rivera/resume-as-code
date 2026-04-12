@@ -50,7 +50,7 @@ def test_render_contains_sender_name():
 def test_render_paragraphs_are_separated():
     md = render_markdown(SAMPLE_DATA)
     # Each paragraph must be separated by a blank line
-    assert '\n\nOpening' in md or 'Opening' in md
+    assert '\n\nOpening paragraph text.' in md
     lines = md.split('\n')
     non_empty = [l for l in lines if l.strip()]
-    assert len(non_empty) >= 6  # heading, date, greeting, 4 paragraphs, sign-off
+    assert len(non_empty) >= 9  # heading, date, greeting, 4 paragraphs, sign-off, sender name

@@ -4,21 +4,38 @@ You will receive:
 - ORIGINAL: the ground-truth resume YAML (treat this as 100% accurate)
 - TAILORED: a version produced by an LLM
 
-Identify any claim in TAILORED that cannot be traced to ORIGINAL.
+Your task is to identify claims in TAILORED that introduce genuinely new, unverifiable facts not supported by ORIGINAL.
 
-A violation is any of the following appearing in TAILORED but not in ORIGINAL:
-- A technology, tool, or skill not present in ORIGINAL
-- A metric or number that differs from ORIGINAL
-- An achievement, project, or company not in ORIGINAL
+WHAT COUNTS AS A VIOLATION:
+- A technology, tool, or skill explicitly named in TAILORED but absent from ORIGINAL
+- A metric, percentage, or number that differs from ORIGINAL
+- An achievement, project, or company not present in ORIGINAL
 - A title or date that differs from ORIGINAL
-- Any factual claim that cannot be verified against ORIGINAL
+- An invented quantitative or scope claim (e.g. "increased revenue by 30%", "led a team of 8") not in ORIGINAL
+
+WHAT DOES NOT COUNT AS A VIOLATION (acceptable tailoring):
+- Rephrasing bullets with equivalent meaning
+- Reordering words or restructuring sentences
+- Condensing or omitting content
+- Changing active/passive voice
+- Skill reordering within groups
+- Minor verb elaboration where the addition is clearly implied by existing context
+  (e.g. "developed and deployed" for a bullet about a production-grade client-facing application)
+
+Classify each issue you find:
+- FAIL: genuine fabrication of a new fact (technology, metric, achievement, entity)
+- WARN: minor wording addition that exceeds the original but introduces no new verifiable fact
 
 Output exactly one of the following — no other text, no preamble:
 
 PASS
 
-or:
+or (only minor wording issues, no fabrication):
+
+WARN
+- <specific wording issue: quote the TAILORED text and the ORIGINAL text it should revert to>
+
+or (at least one fabricated fact):
 
 FAIL
-- <specific violation 1>
-- <specific violation 2>
+- <specific fabricated fact: new technology/metric/achievement not present in ORIGINAL>

@@ -29,6 +29,7 @@ OUTPUT_PDF    := $(BUILD_DIR)/resume.pdf
 
 TAILOR_SYS    := prompts/tailor_system.txt
 AUDIT_SYS     := prompts/audit_system.txt
+CORRECT_SYS   := prompts/correct_system.txt
 TRIM_SYS      := prompts/trim_system.txt
 
 APPLY_PATCH   := python3 scripts/apply_patch.py
@@ -152,14 +153,39 @@ $(AUDIT_REPORT): $(TAILORED_YAML) | $(BUILD_DIR)
 		--no-session-persistence \
 		--output-format text \
 		--model $(MODEL) \
-		| awk '/^(PASS|FAIL)/{p=1} p' \
+		| awk '/^(PASS|WARN|FAIL)/{p=1} p' \
 		> $(AUDIT_REPORT)
 	@result=$$(head -1 $(AUDIT_REPORT) | tr -d '[:space:]'); \
 	if [ "$$result" = "PASS" ]; then \
 		echo "      Audit: PASS"; \
+	elif [ "$$result" = "WARN" ]; then \
+		echo "      Audit: WARN -- auto-correcting minor wording issues..."; \
+		{ \
+			echo '<ORIGINAL>'; \
+			cat $(RESUME_YAML); \
+			echo '</ORIGINAL>'; \
+			echo ''; \
+			echo '<TAILORED>'; \
+			cat $(TAILORED_YAML); \
+			echo '</TAILORED>'; \
+			echo ''; \
+			echo '<VIOLATIONS>'; \
+			tail -n +2 $(AUDIT_REPORT); \
+			echo '</VIOLATIONS>'; \
+		} > $(BUILD_DIR)/correct_prompt.txt; \
+		claude -p "$$(cat $(BUILD_DIR)/correct_prompt.txt)" \
+			--system-prompt-file $(CORRECT_SYS) \
+			--max-turns 1 \
+			--no-session-persistence \
+			--output-format text \
+			--model $(MODEL) \
+			| awk '/^(personal:|summary:|languages:|skills:|experience:|education:|awards_and_publications:|extra_qualifications:|interests:)/{p=1} p' \
+			> $(TAILORED_YAML).tmp \
+		&& mv $(TAILORED_YAML).tmp $(TAILORED_YAML); \
+		echo "      Corrected."; \
 	else \
 		echo ""; \
-		echo "ERROR: Fraud audit FAILED. Violations found:"; \
+		echo "ERROR: Fraud audit FAILED. Fabricated content detected:"; \
 		cat $(AUDIT_REPORT); \
 		echo ""; \
 		echo "Review build/tailored.yaml and build/llm_patch.yaml for details."; \

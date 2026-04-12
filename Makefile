@@ -11,8 +11,6 @@ SHELL       := /bin/bash
 URL         ?=
 MODEL       ?= claude-sonnet-4-6
 MAX_RETRIES := 2
-COMPANY ?=
-ROLE    ?= ML Engineer
 
 
 # ── Paths ─────────────────────────────────────────────────
@@ -31,11 +29,17 @@ TAILOR_SYS    := prompts/tailor_system.txt
 AUDIT_SYS     := prompts/audit_system.txt
 CORRECT_SYS   := prompts/correct_system.txt
 TRIM_SYS      := prompts/trim_system.txt
+FIT_SYS       := prompts/fit_system.txt
+INTEL_SYS     := prompts/intel_system.txt
+
+FIT_ANALYSIS  := $(BUILD_DIR)/fit_analysis.txt
+COMPANY_INTEL := $(BUILD_DIR)/company_intel.txt
+JOB_REPORT    := $(BUILD_DIR)/job_report.md
 
 APPLY_PATCH   := python3 scripts/apply_patch.py
 
 # ── Targets ───────────────────────────────────────────────
-.PHONY: resume fetch tailor audit render clean test compile-test help research \
+.PHONY: resume fetch tailor audit render clean test compile-test help report \
         check-deps _cache_check
 
 # ── Entry point ───────────────────────────────────────────
@@ -248,18 +252,61 @@ render: $(TAILORED_YAML)
 	@$(MAKE) --no-print-directory $(OUTPUT_PDF)
 
 # ── Utilities ─────────────────────────────────────────────
-# ── Company research ──────────────────────────────────────
-research: guard-COMPANY check-deps | $(BUILD_DIR)
-	@echo "Researching: $(COMPANY) | Role: $(ROLE)"
-	@claude \
-		-p "Research $(COMPANY) thoroughly for a candidate applying for the role of $(ROLE). Cover: company overview, recent news (last 6 months), Glassdoor/Blind culture reviews, interview process, salary range, and any red flags. Search the web. Format as a concise report." \
-		--max-turns 3 \
+# ── Job intelligence report ───────────────────────────────
+report: guard-URL check-deps $(JOB_REPORT)
+	@echo ""
+	@echo "Report: $(JOB_REPORT)"
+	@echo ""
+	@cat $(JOB_REPORT)
+
+$(JOB_REPORT): $(JOB_MD) | $(BUILD_DIR)
+	@echo "[1/2] Analysing resume fit..."
+	@{ \
+		echo '<JOB_POSTING>'; \
+		cat $(JOB_MD); \
+		echo '</JOB_POSTING>'; \
+		echo ''; \
+		echo '<RESUME>'; \
+		cat $(RESUME_YAML); \
+		echo '</RESUME>'; \
+	} > $(BUILD_DIR)/fit_prompt.txt
+	@claude -p "$$(cat $(BUILD_DIR)/fit_prompt.txt)" \
+		--system-prompt-file $(FIT_SYS) \
+		--max-turns 1 \
+		--no-session-persistence \
 		--output-format text \
 		--model $(MODEL) \
-		> $(BUILD_DIR)/research_$(COMPANY).md
-	@echo ""
-	@echo "Research saved: $(BUILD_DIR)/research_$(COMPANY).md"
-	@cat $(BUILD_DIR)/research_$(COMPANY).md
+		> $(FIT_ANALYSIS)
+	@test -s $(FIT_ANALYSIS) || { echo "ERROR: fit analysis returned empty"; rm -f $(FIT_ANALYSIS); exit 1; }
+	@is_recruiter=$$(grep '^RECRUITER:' $(FIT_ANALYSIS) | awk '{print tolower($$2)}' | tr -d '[:space:]'); \
+	company=$$(grep '^COMPANY:' $(FIT_ANALYSIS) | sed 's/^COMPANY:[[:space:]]*//'); \
+	role=$$(grep '^ROLE:' $(FIT_ANALYSIS) | sed 's/^ROLE:[[:space:]]*//'); \
+	echo "      $$company — $$role (recruiter=$$is_recruiter)"; \
+	if [ "$$is_recruiter" = "true" ]; then \
+		echo "[2/2] 3rd-party recruiter detected — skipping company intel"; \
+		printf '**Culture & Sentiment**\n3rd-party recruiter posting — company not identified, intel unavailable.\n\n**Recent News**\nN/A\n' > $(COMPANY_INTEL); \
+	else \
+		echo "[2/2] Researching $$company..."; \
+		printf 'Company: %s\nRole: %s\n' "$$company" "$$role" > $(BUILD_DIR)/intel_prompt.txt; \
+		claude -p "$$(cat $(BUILD_DIR)/intel_prompt.txt)" \
+			--system-prompt-file $(INTEL_SYS) \
+			--max-turns 15 \
+			--no-session-persistence \
+			--output-format text \
+			--model $(MODEL) \
+			> $(COMPANY_INTEL); \
+	fi
+	@test -s $(COMPANY_INTEL) || { echo "ERROR: company intel returned empty"; rm -f $(COMPANY_INTEL); exit 1; }
+	@awk '/^---/{p=1; next} p' $(FIT_ANALYSIS) > $(BUILD_DIR)/fit_content.txt
+	@{ \
+		echo "# Job Intelligence Report"; \
+		echo ""; \
+		echo "## Resume Fit"; \
+		cat $(BUILD_DIR)/fit_content.txt; \
+		echo ""; \
+		echo "## Company Intel"; \
+		cat $(COMPANY_INTEL); \
+	} > $(JOB_REPORT)
 
 
 clean:
@@ -290,9 +337,7 @@ help:
 	@echo "  make tailor URL=<url>      Fetch + tailor (no PDF)"
 	@echo "  make audit                 Fraud-check current build/tailored.yaml"
 	@echo "  make render                Recompile PDF (skips LLM steps)"
-	@echo "  make research COMPANY=<name> [ROLE=<title>]"
-	@echo "                             Research a company before applying"
-
+	@echo "  make report URL=<url>      Fit analysis + company intel + news (no PDF)"
 	@echo "  make compile-test          Compile PDF from unmodified resume.yaml (no LLM)"
 	@echo "  make clean                 Wipe build cache"
 	@echo "  make test                  Run unit tests"

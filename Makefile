@@ -71,7 +71,7 @@ APPLY_PATCH   := python3 scripts/apply_patch.py
 
 # ── Targets ───────────────────────────────────────────────
 .PHONY: resume fetch tailor audit render clean test compile-test help report \
-        check-deps _cache_check cover
+        check-deps _cache_check cover apply
 
 # ── Entry point ───────────────────────────────────────────
 resume: guard-URL check-deps _cache_check $(OUTPUT_PDF) $(_cover_targets)
@@ -87,12 +87,13 @@ resume: guard-URL check-deps _cache_check $(OUTPUT_PDF) $(_cover_targets)
 
 # ── Dependency guard ──────────────────────────────────────
 check-deps:
-	@for bin in typst claude curl python3 pdfinfo; do \
+	@for bin in typst claude curl python3 pdfinfo npx; do \
 		command -v $$bin >/dev/null 2>&1 || { \
 			echo "ERROR: '$$bin' not found."; \
 			echo "  typst   -> brew install typst"; \
 			echo "  claude  -> install Claude Code CLI"; \
 			echo "  pdfinfo -> brew install poppler"; \
+			echo "  npx     -> brew install node"; \
 			exit 1; \
 		}; \
 	done
@@ -284,6 +285,10 @@ $(COVER_LETTER_PDF): $(COVER_LETTER_DATA) $(COVER_LETTER_TPL) | $(BUILD_DIR)
 	@echo "      Written: $@"
 
 cover: guard-URL guard-COVER _cache_check $(COVER_LETTER_DATA) $(_cover_targets)
+
+# ── Apply: fill job application form in Arc ───────────────────
+apply: guard-URL check-deps
+	@bash scripts/autofill.sh "$(URL)" $(RESUME_YAML)
 
 # ── Step 4: Compile + page check ─────────────────────────
 $(OUTPUT_PDF): $(AUDIT_REPORT) | $(BUILD_DIR)
@@ -486,6 +491,7 @@ help:
 	@echo "  make audit                          Fraud-check current build/tailored.yaml"
 	@echo "  make render                         Recompile PDF (skips LLM steps)"
 	@echo "  make report URL=<url>               Fit analysis + company intel + news (no PDF)"
+	@echo "  make apply URL=<url>               Fill job application form in Arc (no submit)"
 	@echo "  make compile-test                   Compile PDF from unmodified resume.yaml (no LLM)"
 	@echo "  make clean                          Wipe build cache"
 	@echo "  make test                           Run unit tests"

@@ -23,4 +23,6 @@ RULES:
 6. Do NOT restore or modify the summary, personal, education, or
    awards_and_publications fields.
 
+7. Preserve the exact indentation style of the input YAML.
+
 Output only valid YAML — no commentary, no markdown fences.

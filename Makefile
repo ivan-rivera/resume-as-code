@@ -217,9 +217,9 @@ $(OUTPUT_PDF): $(AUDIT_REPORT) | $(BUILD_DIR)
 					echo "      WARN: fill caused overflow — reverting to pre-fill YAML"; \
 					cp $(BUILD_DIR)/pre_fill.yaml $$current_yaml; \
 					just_filled=0; \
-					cat $(BUILD_DIR)/.current_hash > $(HASH_FILE); \
-					break; \
+					continue; \
 				fi; \
+				fill_retries=0; \
 				retries=$$((retries + 1)); \
 				if [ $$retries -gt $(MAX_RETRIES) ]; then \
 					echo ""; \
@@ -296,6 +296,7 @@ $(OUTPUT_PDF): $(AUDIT_REPORT) | $(BUILD_DIR)
 				--model $(MODEL) \
 				| awk '/^(personal:|summary:|languages:|skills:|experience:|education:|awards_and_publications:|extra_qualifications:|interests:)/{p=1} p' \
 				> $${current_yaml}.tmp \
+			&& test -s $${current_yaml}.tmp \
 			&& mv $${current_yaml}.tmp $$current_yaml || { \
 				echo "      WARN: fill LLM call failed — accepted"; \
 				cat $(BUILD_DIR)/.current_hash > $(HASH_FILE); \

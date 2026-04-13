@@ -69,8 +69,8 @@ def main() -> None:
     try:
         entry_ends = _run_query("<exp-entry-end>")
         page_height_els = _run_query("<page-height-pt>")
-    except subprocess.CalledProcessError as exc:
-        print(f"WARN: typst query failed: {exc.stderr.strip()}", file=sys.stderr)
+    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+        print(f"WARN: typst query failed: {exc}", file=sys.stderr)
         print("0.0")
         sys.exit(0)
     except json.JSONDecodeError as exc:

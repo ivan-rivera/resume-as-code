@@ -210,7 +210,7 @@ $(OUTPUT_PDF): $(AUDIT_REPORT) | $(BUILD_DIR)
 	just_filled=0; \
 	current_yaml=$(TAILORED_YAML); \
 	while true; do \
-		if typst compile $(TYPST_TPL) $@ 2>/dev/null; then \
+		if typst compile $(TYPST_TPL) $@ --input skip-assert=true 2>/dev/null; then \
 			pages=$$(pdfinfo $@ 2>/dev/null | awk '/^Pages:/{print $$2}' || echo "0"); \
 			if [ "$$pages" -gt 2 ]; then \
 				if [ "$$just_filled" -eq 1 ]; then \

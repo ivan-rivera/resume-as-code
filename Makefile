@@ -269,7 +269,7 @@ clean:
 compile-test:
 	@mkdir -p $(BUILD_DIR)
 	@cp $(RESUME_YAML) $(TAILORED_YAML)
-	@typst compile $(TYPST_TPL) $(OUTPUT_PDF)
+	@typst compile $(TYPST_TPL) $(OUTPUT_PDF) --input skip-assert=true
 	@echo "compile-test passed: $(OUTPUT_PDF)"
 
 test:

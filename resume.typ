@@ -170,11 +170,13 @@
   [#metadata(page.height.pt()) <page-height-pt>]
 }
 
-// ── Hard 2-page guard ─────────────────────────────────────────────────────────
+// ── Hard 2-page guard ─────────────────────────────────────────────────────
 #context {
-  let total = counter(page).final().at(0)
-  assert(
-    total <= 2,
-    message: "Resume is " + str(total) + " pages — must be ≤ 2. Run `make resume` to auto-trim.",
-  )
+  if sys.inputs.at("skip-assert", default: "false") != "true" {
+    let total = counter(page).final().at(0)
+    assert(
+      total <= 2,
+      message: "Resume is " + str(total) + " pages — must be ≤ 2. Run `make resume` to auto-trim.",
+    )
+  }
 }

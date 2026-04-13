@@ -37,6 +37,7 @@
     text(weight: "semibold", title)
   }
   block(
+    breakable: false,
     inset: (top: 3pt),
     width: 100%,
     below: 1.7em,
@@ -133,6 +134,7 @@
               v(0.2em)
             }
             bullet-list(job.bullets)
+            [#metadata(job.company) <exp-entry-end>]
           },
         )
       }
@@ -162,6 +164,11 @@
 
   ],
 )
+
+// ── Page height capture for gap measurement ───────────────────────────────
+#context {
+  [#metadata(page.height.pt()) <page-height-pt>]
+}
 
 // ── Hard 2-page guard ─────────────────────────────────────────────────────────
 #context {

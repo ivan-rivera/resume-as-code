@@ -134,7 +134,11 @@
               v(0.2em)
             }
             bullet-list(job.bullets)
-            [#metadata(job.company) <exp-entry-end>]
+            context {
+              let pos = here()
+              let p = pos.position()
+              [#metadata((page: pos.page(), y: p.y.pt())) <exp-entry-end>]
+            }
           },
         )
       }

@@ -37,6 +37,7 @@
     text(weight: "semibold", title)
   }
   block(
+    breakable: false,
     inset: (top: 3pt),
     width: 100%,
     below: 1.7em,
@@ -133,6 +134,11 @@
               v(0.2em)
             }
             bullet-list(job.bullets)
+            context {
+              let pos = here()
+              let p = pos.position()
+              [#metadata((page: pos.page(), y: p.y.pt())) <exp-entry-end>]
+            }
           },
         )
       }
@@ -163,11 +169,18 @@
   ],
 )
 
-// ── Hard 2-page guard ─────────────────────────────────────────────────────────
+// ── Page height capture for gap measurement ───────────────────────────────
 #context {
-  let total = counter(page).final().at(0)
-  assert(
-    total <= 2,
-    message: "Resume is " + str(total) + " pages — must be ≤ 2. Run `make resume` to auto-trim.",
-  )
+  [#metadata(page.height.pt()) <page-height-pt>]
+}
+
+// ── Hard 2-page guard ─────────────────────────────────────────────────────
+#context {
+  if sys.inputs.at("skip-assert", default: "false") != "true" {
+    let total = counter(page).final().at(0)
+    assert(
+      total <= 2,
+      message: "Resume is " + str(total) + " pages — must be ≤ 2. Run `make resume` to auto-trim.",
+    )
+  }
 }

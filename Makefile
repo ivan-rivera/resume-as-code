@@ -31,6 +31,10 @@ CORRECT_SYS   := prompts/correct_system.txt
 TRIM_SYS      := prompts/trim_system.txt
 FIT_SYS       := prompts/fit_system.txt
 INTEL_SYS     := prompts/intel_system.txt
+FILL_SYS      := prompts/fill_system.txt
+PRE_TRIM_YAML := $(BUILD_DIR)/pre_trim.yaml
+GAP_THRESHOLD_MM := 20
+MAX_FILL_RETRIES := 2
 
 FIT_ANALYSIS  := $(BUILD_DIR)/fit_analysis.txt
 COMPANY_INTEL := $(BUILD_DIR)/company_intel.txt
@@ -94,6 +98,8 @@ check-deps:
 	done
 	@python3 -c "import yaml" 2>/dev/null || \
 		(echo "ERROR: pyyaml missing. Run: pip install pyyaml"; exit 1)
+	@python3 scripts/measure_gap.py --check 2>/dev/null || \
+		echo "WARN: typst query unavailable — gap check will be skipped"
 
 # ── Cache invalidation ────────────────────────────────────
 $(BUILD_DIR):
@@ -283,46 +289,106 @@ cover: guard-URL guard-COVER _cache_check $(COVER_LETTER_DATA) $(_cover_targets)
 $(OUTPUT_PDF): $(AUDIT_REPORT) | $(BUILD_DIR)
 	@echo "[4/4] Compiling PDF..."
 	@retries=0; \
+	fill_retries=0; \
+	pre_trim_saved=0; \
+	just_filled=0; \
 	current_yaml=$(TAILORED_YAML); \
 	while true; do \
-		if typst compile $(TYPST_TPL) $@ 2>/dev/null; then \
+		if typst compile $(TYPST_TPL) $@ --input skip-assert=true 2>/dev/null; then \
 			pages=$$(pdfinfo $@ 2>/dev/null | awk '/^Pages:/{print $$2}' || echo "0"); \
-			if [ "$$pages" -le 2 ]; then \
-				echo "      Compiled: $$pages page(s)"; \
+			if [ "$$pages" -gt 2 ]; then \
+				if [ "$$just_filled" -eq 1 ]; then \
+					echo "      WARN: fill caused overflow — reverting to pre-fill YAML"; \
+					cp $(BUILD_DIR)/pre_fill.yaml $$current_yaml; \
+					just_filled=0; \
+					continue; \
+				fi; \
+				fill_retries=0; \
+				retries=$$((retries + 1)); \
+				if [ $$retries -gt $(MAX_RETRIES) ]; then \
+					echo ""; \
+					echo "ERROR: Resume is $$pages pages after $(MAX_RETRIES) trim attempts."; \
+					echo "Suggested manual cuts (in order):"; \
+					echo "  1. extra_qualifications section"; \
+					echo "  2. interests section"; \
+					echo "  3. GetYourGuide bullets -> title only"; \
+					echo "  4. Bank of New Zealand bullets -> 2 max"; \
+					echo "  5. Zalando bullets -> 1 max"; \
+					exit 1; \
+				fi; \
+				if [ $$pre_trim_saved -eq 0 ]; then \
+					cp $$current_yaml $(PRE_TRIM_YAML); \
+					pre_trim_saved=1; \
+				fi; \
+				echo "      Over limit ($$pages pages) -- trimming (attempt $$retries/$(MAX_RETRIES))..."; \
+				{ \
+					echo '<TAILORED_YAML>'; \
+					cat $$current_yaml; \
+					echo '</TAILORED_YAML>'; \
+					echo ''; \
+					echo "The resume compiles to $$pages pages. Trim to fit 2 pages."; \
+				} > $(BUILD_DIR)/trim_prompt.txt; \
+				claude -p "$$(cat $(BUILD_DIR)/trim_prompt.txt)" \
+					--system-prompt-file $(TRIM_SYS) \
+					--max-turns 1 \
+					--no-session-persistence \
+					--output-format text \
+					--model $(MODEL) \
+					| awk '/^(personal:|summary:|languages:|skills:|experience:|education:|awards_and_publications:|extra_qualifications:|interests:)/{p=1} p' \
+					> $${current_yaml}.tmp \
+				&& mv $${current_yaml}.tmp $$current_yaml; \
+				continue; \
+			fi; \
+			just_filled=0; \
+			echo "      Compiled: $$pages page(s)"; \
+			gap=$$(python3 scripts/measure_gap.py 2>/dev/null || echo "0.0"); \
+			gap_ok=$$(echo "$$gap $(GAP_THRESHOLD_MM)" | awk '{print ($$1 <= $$2) ? "1" : "0"}'); \
+			if [ "$$gap_ok" = "1" ]; then \
+				echo "      Gap: $${gap}mm (OK)"; \
 				cat $(BUILD_DIR)/.current_hash > $(HASH_FILE); \
 				break; \
 			fi; \
-			retries=$$((retries + 1)); \
-			if [ $$retries -gt $(MAX_RETRIES) ]; then \
-				echo ""; \
-				echo "ERROR: Resume is $$pages pages after $(MAX_RETRIES) trim attempts."; \
-				echo "Suggested manual cuts (in order):"; \
-				echo "  1. extra_qualifications section"; \
-				echo "  2. interests section"; \
-				echo "  3. GetYourGuide bullets -> title only"; \
-				echo "  4. Bank of New Zealand bullets -> 2 max"; \
-				echo "  5. Zalando bullets -> 1 max"; \
-				exit 1; \
+			if [ ! -f "$(PRE_TRIM_YAML)" ]; then \
+				echo "      WARN: gap $${gap}mm but nothing was trimmed (structural spacing — accepted)"; \
+				cat $(BUILD_DIR)/.current_hash > $(HASH_FILE); \
+				break; \
 			fi; \
-			echo "      Over limit ($$pages pages) -- trimming (attempt $$retries/$(MAX_RETRIES))..."; \
+			fill_retries=$$((fill_retries + 1)); \
+			if [ "$$fill_retries" -gt "$(MAX_FILL_RETRIES)" ]; then \
+				echo "      WARN: gap $${gap}mm after $(MAX_FILL_RETRIES) fill attempts (accepted)"; \
+				cat $(BUILD_DIR)/.current_hash > $(HASH_FILE); \
+				break; \
+			fi; \
+			echo "      Gap $${gap}mm > $(GAP_THRESHOLD_MM)mm -- filling (attempt $$fill_retries/$(MAX_FILL_RETRIES))..."; \
+			cp $$current_yaml $(BUILD_DIR)/pre_fill.yaml; \
 			{ \
-				echo '<TAILORED_YAML>'; \
-				cat $$current_yaml; \
-				echo '</TAILORED_YAML>'; \
+				echo '<ORIGINAL>'; \
+				cat $(PRE_TRIM_YAML); \
+				echo '</ORIGINAL>'; \
 				echo ''; \
-				echo "The resume compiles to $$pages pages. Trim to fit 2 pages."; \
-			} > $(BUILD_DIR)/trim_prompt.txt; \
-			claude -p "$$(cat $(BUILD_DIR)/trim_prompt.txt)" \
-				--system-prompt-file $(TRIM_SYS) \
+				echo '<TRIMMED>'; \
+				cat $$current_yaml; \
+				echo '</TRIMMED>'; \
+				echo ''; \
+				echo "<GAP_MM>$$gap</GAP_MM>"; \
+			} > $(BUILD_DIR)/fill_prompt.txt; \
+			claude -p "$$(cat $(BUILD_DIR)/fill_prompt.txt)" \
+				--system-prompt-file $(FILL_SYS) \
 				--max-turns 1 \
 				--no-session-persistence \
 				--output-format text \
 				--model $(MODEL) \
 				| awk '/^(personal:|summary:|languages:|skills:|experience:|education:|awards_and_publications:|extra_qualifications:|interests:)/{p=1} p' \
 				> $${current_yaml}.tmp \
-			&& mv $${current_yaml}.tmp $$current_yaml; \
+			&& test -s $${current_yaml}.tmp \
+			&& mv $${current_yaml}.tmp $$current_yaml || { \
+				echo "      WARN: fill LLM call failed — accepted"; \
+				cat $(BUILD_DIR)/.current_hash > $(HASH_FILE); \
+				break; \
+			}; \
+			just_filled=1; \
 		else \
-			echo "ERROR: typst compile failed. Check resume.typ syntax."; \
+			echo "ERROR: typst compile failed. Check $(TYPST_TPL) syntax."; \
 			exit 1; \
 		fi; \
 	done

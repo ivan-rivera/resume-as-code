@@ -97,3 +97,12 @@ Format: append a dated entry to the `## Session Log` section below.
 - Tailor prompt tightened: added explicit prohibition on modifying `summary`, `personal`, `education`, `awards_and_publications` fields. Only `experience` bullets and `skills` ordering may be changed.
 - Fraud auditor confirmed working: caught LLM attempt to change "ML specialist" to "Senior ML engineer" and fabricate MLOps achievement.
 - Full pipeline verified: 10 patches applied, audit PASS, 2-page PDF produced.
+
+### 2026-04-13 — Form autofill feature
+- Added `make apply URL=<url>` target for automated browser form filling.
+- Architecture: `autofill.sh` launches Arc with `--remote-debugging-port=9222`; Playwright MCP connects via `--cdp-endpoint http://localhost:9222`; Claude fills fields semantically from `data/resume.yaml`.
+- CDP bridge is how the browser stays open after `claude -p` exits — Arc launched independently survives the MCP server shutdown.
+- `config/playwright-mcp.json` uses key `playwright-arc` (not `playwright`) to avoid colliding with the global `playwright@claude-plugins-official` plugin.
+- File upload fields always skipped — attach resume PDF and cover letter manually.
+- Multi-page form navigation (Next/Continue) is out of scope for v1.
+- **Not yet smoke tested** — run `make apply URL=<live-form-url>` and append ATS-specific notes here.

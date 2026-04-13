@@ -1,16 +1,8 @@
-#import "@preview/fireside:1.0.0": fireside
-
 #let d = yaml("build/cover_letter_data.yaml")
 
-#show: fireside.with(
-  title: [#d.sender.name],
-  from-details: [
-    #d.sender.name
-  ],
-  to-details: [
-    #d.recipient.company
-  ],
-)
+#set page(paper: "a4", margin: (x: 2.8cm, y: 3cm))
+#set text(font: ("Fira Sans", "Liberation Sans", "Arial"), size: 11pt, lang: "en")
+#set par(leading: 0.7em, spacing: 1.4em)
 
 Dear Hiring Team,
 
@@ -22,6 +14,6 @@ Dear Hiring Team,
 
 #d.paragraphs.closing
 
-Sincerely,
+Warm regards,
 
 #d.sender.name

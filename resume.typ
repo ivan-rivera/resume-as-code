@@ -85,16 +85,6 @@
       #d.summary
     ]
 
-    #sidebar-section(title: "Languages")[
-      #skill-levels(
-        d.languages.map(l => (
-          icon:  image(l.flag),
-          text:  l.name,
-          level: level-ratio(l.level),
-        ))
-      )
-    ]
-
     #for group in d.skills {
       skill-group(
         name:   group.group,
